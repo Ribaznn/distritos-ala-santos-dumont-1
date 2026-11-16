@@ -1,0 +1,90 @@
+/* =====================================================================
+   TEMA VISUAL — inspirado no site churchofjesuschrist.org
+   Fundo branco, texto quase preto, azul-petróleo #006184 nos botões e
+   destaques, barrinha azul acima dos títulos e fonte sem serifa limpa.
+   As fontes Ensign do site são proprietárias; aqui usamos Noto Sans/Serif.
+   O logo da Igreja NÃO é usado (marca registrada).
+   Carregado depois do <style> de cada página: só sobrescreve a aparência.
+   ===================================================================== */
+:root {
+  --bg: #ffffff; --panel: #ffffff; --text: #212225; --muted: #6b6e70;
+  --border: #d9dbdb; --chip: #f0f3f4;
+  --azul: #006184; --azul-escuro: #004d69; --azul-claro: #e6f0f3;
+  --shadow: 0 1px 2px rgba(0,0,0,.06), 0 4px 14px rgba(0,0,0,.07);
+  --fonte: "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --fonte-serif: "Noto Serif", Georgia, serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #121517; --panel: #1a1e21; --text: #eceeee; --muted: #a2a7aa;
+    --border: #30363a; --chip: #232a2e; --azul: #4aa8cc; --azul-escuro: #7cc3df; --azul-claro: #16323d;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #121517; --panel: #1a1e21; --text: #eceeee; --muted: #a2a7aa;
+  --border: #30363a; --chip: #232a2e; --azul: #4aa8cc; --azul-escuro: #7cc3df; --azul-claro: #16323d;
+}
+
+html, body { font-family: var(--fonte); color: var(--text); }
+body { background: var(--bg); }
+
+/* Cabeçalho: sobretítulo em azul e barrinha azul acima do título, como no site */
+.eyebrow, header .eyebrow { color: var(--azul); font-weight: 600; letter-spacing: .08em; }
+h1 { font-family: var(--fonte); font-weight: 700; letter-spacing: -.01em; }
+h1::before { content: ""; display: block; width: 56px; height: 4px; background: var(--azul); margin: 6px 0 10px; }
+header { background: var(--panel); border-bottom: 1px solid var(--border); }
+
+/* Botões: retangulares, cantos de 4px; principal cheio em azul, os outros com contorno */
+.btn, .tab, .jump button, .vm {
+  border-radius: 4px; border-color: var(--azul); color: var(--azul); background: var(--panel); font-family: var(--fonte);
+}
+.btn:hover, .tab:hover, .jump button:hover, .vm:hover { background: var(--azul-claro); }
+.btn.primary, .tab.on, .map-tools .btn.on, li.open .vm {
+  background: var(--azul); border-color: var(--azul); color: #fff;
+}
+.btn.primary:hover, .tab.on:hover, .map-tools .btn.on:hover { background: var(--azul-escuro); border-color: var(--azul-escuro); opacity: 1; }
+.map-tools .btn { color: var(--azul); border-color: #c9d6db; border-radius: 4px; }
+a { color: var(--azul); }
+.back { color: var(--azul); }
+
+/* Cartões e listas: brancos, borda fina, sem cantos muito redondos */
+.card, .head, ol, .stat div { border-radius: 6px; }
+.card:hover, .card.active { box-shadow: var(--shadow); }
+.chip { background: var(--chip); border-radius: 4px; }
+.tools input { border-radius: 4px; font-family: var(--fonte); }
+.tools input:focus { outline: 2px solid var(--azul); outline-offset: 1px; border-color: var(--azul); }
+mark { background: #f9edbe; }
+
+/* Textos dos mapas */
+.lbl-bairro, .lbl-lugar, .dp, .num, .lbl { font-family: var(--fonte); }
+.dp-l, .dp-s { color: var(--muted); }
+
+/* Rodapé com uma faixa azul fina no topo */
+footer { border-top: 3px solid var(--azul); }
+
+/* Versão para impressão (organizacao.html) */
+.page h1::before { margin-top: 0; }
+th { border-bottom-color: var(--azul) !important; color: var(--muted); }
+.sub, .note { color: var(--muted); }
+.cap h2, .page > h2 { color: var(--text); }
+
+/* Logo da Igreja no topo (img/logo-igreja.svg, baixado de churchofjesuschrist.org).
+   Marca registrada: usar só em material oficial da unidade, sem publicação aberta. */
+.logo-igreja { display: block; height: 58px; width: auto; margin: 0 0 14px; }
+.page .logo-igreja { height: 40px; margin-bottom: 6px; }
+.page h1::before { margin: 0 0 6px; }
+.page .areas { gap: 2mm; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .logo-igreja { filter: invert(1) brightness(1.6); } }
+:root[data-theme="dark"] .logo-igreja { filter: invert(1) brightness(1.6); }
+@media print { .logo-igreja { filter: none !important; } }
+
+/* Tela de senha da lista de famílias (site publicado) */
+.cofre { position: fixed; inset: 0; z-index: 2000; display: grid; place-items: center; padding: 16px; background: var(--bg); }
+.cofre-card { width: 100%; max-width: 380px; background: var(--panel); border: 1px solid var(--border); border-top: 4px solid var(--azul); border-radius: 6px; padding: 24px; display: grid; gap: 12px; box-shadow: var(--shadow); }
+.cofre-card h2 { margin: 0; font-size: 20px; }
+.cofre-card p { margin: 0; color: var(--muted); }
+.cofre-card input { font: inherit; font-size: 16px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 4px; background: var(--panel); color: var(--text); }
+.cofre-card input:focus { outline: 2px solid var(--azul); outline-offset: 1px; }
+.cofre-card .btn { justify-content: center; padding: 10px 14px; font-size: 15px; }
+.cofre-erro { color: #b3261e !important; font-weight: 600; }
+.cofre-voltar { font-size: 14px; text-align: center; }

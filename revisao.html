@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Revisão das Linhas</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root { --bg: #f4f4f1; --panel: #fff; --text: #1d1d1f; --muted: #66665f; --border: #e3e2dc; --chip: #f1f0ea; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #151614; --panel: #1e1f1c; --text: #ecebe6; --muted: #a3a29b; --border: #33342f; --chip: #2a2b27; } }
+  :root[data-theme="dark"] { --bg: #151614; --panel: #1e1f1c; --text: #ecebe6; --muted: #a3a29b; --border: #33342f; --chip: #2a2b27; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--text); font: 14px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+  .app { display: grid; grid-template-columns: 430px 1fr; height: 100vh; }
+  aside { background: var(--panel); border-right: 1px solid var(--border); overflow-y: auto; padding: 18px 20px 24px; }
+  .eyebrow { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+  h1 { font-size: 20px; margin: 0 0 6px; } h2 { font-size: 15px; margin: 18px 0 6px; }
+  p { margin: 0 0 8px; } .muted { color: var(--muted); font-size: 13px; }
+  .stat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 10px 0 4px; }
+  .stat div { background: var(--chip); border-radius: 10px; padding: 8px 10px; }
+  .stat b { display: block; font-size: 20px; font-variant-numeric: tabular-nums; }
+  .stat span { font-size: 12px; color: var(--muted); }
+  ol { margin: 4px 0 0; padding-left: 20px; } li { margin: 2px 0; } li small { color: var(--muted); }
+  .k { display: inline-block; width: 18px; height: 0; border-top: 3px solid; vertical-align: middle; margin-right: 6px; }
+  .legend div { margin: 3px 0; font-size: 13px; }
+  .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #2f8cff; margin: 0 11px 0 5px; vertical-align: middle; }
+  .jump { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .jump button { border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  .jump button:hover { background: var(--chip); }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; } td, th { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--border); } th { color: var(--muted); font-weight: 600; font-size: 12px; }
+  #map { height: 100%; }
+  #map .leaflet-tile-pane { filter: saturate(.5) brightness(1.03); }
+  .back { font-size: 13px; }
+  @media (max-width: 860px) { .app { grid-template-columns: 1fr; grid-template-rows: 60vh auto; height: auto; } .mapwrap { order: -1; height: 60vh; } aside { border-right: 0; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&family=Noto+Serif:wght@400;700&display=swap">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<div class="app">
+  <aside>
+    <img class="logo-igreja" src="img/logo-igreja.svg" alt="A Igreja de Jesus Cristo dos Santos dos Últimos Dias">
+    <p class="eyebrow">Ala Santos Dumont 1 · conferência com o mapa original</p>
+    <h1>Revisão das linhas</h1>
+    <p class="muted">Pontos azuis = pixels da linha azul extraídos das capturas do mapa do diretório (só a linha; nada de dados de membros). Linhas coloridas = traçado novo.</p>
+    <div class="legend">
+      <div><span class="k" style="border-color:#e00000"></span>Sobre o eixo de rua/rodovia (OpenStreetMap)</div>
+      <div><span class="k" style="border-color:#8e24aa"></span>Sobre o eixo de rio (OpenStreetMap)</div>
+      <div><span class="k" style="border-color:#00a046"></span>Copiado da linha azul (onde ela não segue via)</div>
+      <div><span class="k" style="border-color:#0d47a1"></span>Limite final da ala</div>
+      <div><span class="k" style="border-color:#ff8f00;border-top-style:dashed"></span>Limite anterior (antes da revisão)</div>
+      <div><span class="dot"></span>Linha azul original (pixels extraídos)</div>
+    </div>
+
+    <h2>Aracaju — divisa por ruas (zoom 15, ~4,6 m/pixel)</h2>
+    <div class="stat" id="st1"><div><b>…</b><span>até 5 m</span></div><div><b>…</b><span>até 10 m</span></div><div><b>…</b><span>até 15 m</span></div></div>
+    <p class="muted">Parcela dos pixels azuis a até X m do traçado novo. A faixa azul tem ~14 m de largura na captura; o que passa de 15 m são rótulos azuis do próprio mapa (ex.: “Parnamirim River”) e bordas dos marcadores laranja.</p>
+    <p class="muted">Nos 5 pontos em que o traçado se afasta mais de 15 m da linha azul (40–80 m cada), a linha está escondida sob um marcador laranja do mapa original; ali o traçado segue a mesma rua.</p>
+    <p><b>Percurso (norte → sul):</b></p>
+    <ol id="ruas"></ol>
+
+    <h2>Norte — Japaratuba / Pirambu (zoom 13, ~19 m/pixel)</h2>
+    <div class="stat" id="st2"><div><b>…</b><span>até 20 m</span></div><div><b>…</b><span>até 30 m</span></div><div><b>…</b><span>até 40 m</span></div></div>
+    <p class="muted">Parcela dos pixels azuis a até X m do traçado novo. Nesse zoom a faixa azul tem ~60 m de largura, então “até 30 m” significa dentro da faixa.</p>
+    <p class="muted">Onde a linha azul segue rodovia (Rod. Japaratuba–Pirambu, SE-226 / Rod. Seixas Dória), o traçado está sobre o eixo da rodovia. Nos rios (Rio Papagaio, Rio Poxim) e trechos sem via, o traçado segue o centro da faixa azul: o desenho original é mais suave que o leito do rio. A linha contorna a cidade de Japaratuba pelo oeste e o povoado de São José da Caatinga pelo oeste, deixando ambos dentro da ala.</p>
+    <ol id="norte"></ol>
+
+    <h2>Demais trechos</h2>
+    <table><thead><tr><th>Trecho</th><th>Fonte</th><th>Distância mediana pixel azul → traçado</th></tr></thead><tbody id="outros"></tbody></table>
+    <p class="muted" style="margin-top:6px">Nesses trechos (rio, mar e a divisa reta) não há rua; o traçado segue o centro da faixa azul. Como a faixa azul nessas capturas é larga, a distância mediana fica perto de metade da largura da faixa.</p>
+
+    <h2>Ir para</h2>
+    <div class="jump" id="jump"></div>
+    <p class="back" style="margin-top:16px"><a href="index.html">← Voltar ao mapa dos distritos</a></p>
+  </aside>
+  <div class="mapwrap"><div id="map"></div></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script>
+(async function () {
+  const get = u => fetch(u).then(r => r.json());
+  const [ward, old, azul, outros0, tA, tN, div, azN] = await Promise.all([
+    get('data/limite_ala.geojson'), get('data/limite_ala_anterior.geojson'), get('data/azul_extraida_z15.geojson'),
+    get('data/azul_extraida_outros.geojson'), get('data/trechos_aracaju.geojson'), get('data/trechos_norte.geojson'), get('data/divisa_d1_d2.geojson'),
+    get('data/azul_norte_z13.geojson')]);
+  // as capturas de zoom 11 foram substituídas pelas de zoom 13 no norte
+  const outros = { features: outros0.features.filter(f => !/^z11/.test(f.properties.captura)).concat([azN]) };
+  const map = L.map('map', { preferCanvas: true }).fitBounds([[-10.935, -37.082], [-10.858, -37.03]]);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '&copy; colaboradores do OpenStreetMap' }).addTo(map);
+  const dist = (a, b) => Math.hypot((a[0] - b[0]) * 111320 * Math.cos(a[1] * Math.PI / 180), (a[1] - b[1]) * 110574);
+
+  // pontos azuis (canvas único)
+  const pts = azul.geometry.coordinates.map(p => [p, 3]).concat(...outros.features.map(f => f.geometry.coordinates.map(p => [p, f.properties.metros_por_pixel])));
+  const Dots = L.Layer.extend({
+    onAdd(m) { this._c = L.DomUtil.create('canvas', 'leaflet-zoom-hide'); m.getPanes().overlayPane.appendChild(this._c); m.on('moveend zoomend', this._draw, this); this._draw(); },
+    onRemove(m) { this._c.remove(); m.off('moveend zoomend', this._draw, this); },
+    _draw() { const m = this._map, s = m.getSize(); this._c.width = s.x; this._c.height = s.y; L.DomUtil.setPosition(this._c, m.containerPointToLayerPoint([0, 0]));
+      const ctx = this._c.getContext('2d'), b = m.getBounds().pad(.05), z = m.getZoom(); ctx.fillStyle = 'rgba(47,140,255,.55)';
+      for (const [p, res] of pts) { if (!b.contains([p[1], p[0]])) continue; if (res > 40 && z > 14) continue; if (res < 10 && z < 12) continue; const q = m.latLngToContainerPoint([p[1], p[0]]); const r = z >= 16 ? 2 : 1.5; ctx.fillRect(q.x - r, q.y - r, 2 * r, 2 * r); } }
+  });
+  new Dots().addTo(map);
+  L.geoJSON(old, { style: { color: '#ff8f00', weight: 2, dashArray: '6 5', fill: false }, interactive: false }).addTo(map);
+  L.geoJSON(ward, { style: { color: '#0d47a1', weight: 2, fill: false }, interactive: false }).addTo(map);
+  // trechos coloridos por tipo
+  const RIO = /^Rio |curso d'água/;
+  function drawSec(sec) { const k = sec.properties.trechos, c = sec.geometry.coordinates;
+    for (let i = 0; i < k.length; i++) { const t = k[i]; const verde = t === 'azul' || t === 'conexao' || t === 'reta'; const col = verde ? '#00a046' : (RIO.test(t) ? '#8e24aa' : '#e00000');
+      L.polyline([[c[i][1], c[i][0]], [c[i + 1][1], c[i + 1][0]]], { color: col, weight: 3.5 }).bindTooltip(t === 'reta' ? 'divisa reta (linha azul)' : (verde ? 'copiado da linha azul' : t), { sticky: true }).addTo(map); } }
+  drawSec(tA); drawSec(tN);
+  L.polyline(div.features[0].geometry.coordinates.slice(1, -1).map(p => [p[1], p[0]]), { color: '#1d1d1f', weight: 2.5, dashArray: '7 5' }).bindTooltip('Divisa Distrito 01 × 02 (ruas)', { sticky: true }).addTo(map);
+
+  // lista de ruas
+  function resumo(sec, rotulo) { const k = sec.properties.trechos, c = sec.geometry.coordinates; let out = []; let cur = null;
+    for (let i = 0; i < k.length; i++) { let t = k[i]; if (t === 'conexao') { if (cur) cur.m += dist(c[i], c[i + 1]); continue; }
+      const d = dist(c[i], c[i + 1]); if (cur && cur.t === t) { cur.m += d; cur.j = i + 1; } else { cur = { t, m: d, i, j: i + 1 }; out.push(cur); } }
+    out = out.filter(s => s.m >= 40);
+    const merged = []; for (const s of out) { const last = merged[merged.length - 1]; if (last && last.t === s.t) { last.m += s.m; last.j = s.j; } else merged.push(Object.assign({}, s)); }
+    merged.forEach((s, idx) => { if (s.t === 'azul') { const mid = c[Math.floor((s.i + s.j) / 2)]; s.t = rotulo(s, idx, merged.length, mid); } });
+    return merged; }
+  const rotA = (s, idx, n, mid) => idx === 0 ? 'Rio Sergipe e Rio do Sal (linha azul no leito do rio)' : (idx === n - 1 ? 'Rio Sergipe (linha azul no leito do rio)'
+    : (mid[0] > -37.078 && mid[0] < -37.069 && mid[1] > -10.903 && mid[1] < -10.893 ? 'contorno da área do 28º Batalhão de Caçadores — sem rua (linha azul)' : 'trecho curto sem rua (linha azul)'));
+  const rotN = (s, idx, n, mid) => mid[1] > -10.66 && mid[0] > -36.80 ? 'litoral e Rio Papagaio / Rio Poxim (centro da faixa azul)'
+    : (mid[1] > -10.62 && mid[0] < -36.93 ? 'contorno de Japaratuba pelo oeste (linha azul)'
+    : (mid[1] < -10.63 && mid[1] > -10.68 ? 'contorno de São José da Caatinga pelo oeste (linha azul)'
+    : (mid[1] < -10.71 ? 'início da divisa reta, com leve curva (linha azul)' : 'trecho sem via (linha azul)')));
+  const rotReta = s => { if (s.t === 'reta') s.t = 'divisa reta até o Rio Sergipe (linha azul)'; return s; };
+  const fmt = m => m >= 1000 ? (m / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' km' : Math.round(m) + ' m';
+  const li = s => '<li>' + s.t.replace(/</g, '&lt;') + ' <small>(' + fmt(s.m) + ')</small></li>';
+  document.getElementById('ruas').innerHTML = resumo(tA, rotA).map(li).join('');
+  document.getElementById('norte').innerHTML = resumo(tN, rotN).map(rotReta).map(li).join('');
+
+  // estatística: raster de distância até o limite novo
+  function raster(lines, bbox, res) { const latm = (bbox[1] + bbox[3]) / 2, ml = 111320 * Math.cos(latm * Math.PI / 180), dx = res / ml, dy = res / 110574, nx = Math.ceil((bbox[2] - bbox[0]) / dx), ny = Math.ceil((bbox[3] - bbox[1]) / dy), D = new Float32Array(nx * ny).fill(1e9);
+    for (const L0 of lines) for (let i = 0; i < L0.length - 1; i++) { const p = L0[i], q = L0[i + 1], n = Math.max(1, Math.ceil(dist(p, q) / (res / 2))); for (let k = 0; k <= n; k++) { const x = p[0] + (q[0] - p[0]) * k / n, y = p[1] + (q[1] - p[1]) * k / n, a = Math.floor((x - bbox[0]) / dx), b = Math.floor((y - bbox[1]) / dy); if (a >= 0 && b >= 0 && a < nx && b < ny) D[b * nx + a] = 0; } }
+    const s2 = Math.SQRT2; for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) { const k = j * nx + i; let v = D[k]; if (i > 0) v = Math.min(v, D[k - 1] + 1); if (j > 0) { v = Math.min(v, D[k - nx] + 1); if (i > 0) v = Math.min(v, D[k - nx - 1] + s2); if (i < nx - 1) v = Math.min(v, D[k - nx + 1] + s2); } D[k] = v; }
+    for (let j = ny - 1; j >= 0; j--) for (let i = nx - 1; i >= 0; i--) { const k = j * nx + i; let v = D[k]; if (i < nx - 1) v = Math.min(v, D[k + 1] + 1); if (j < ny - 1) { v = Math.min(v, D[k + nx] + 1); if (i < nx - 1) v = Math.min(v, D[k + nx + 1] + s2); if (i > 0) v = Math.min(v, D[k + nx - 1] + s2); } D[k] = v; }
+    return p => { const a = Math.floor((p[0] - bbox[0]) / dx), b = Math.floor((p[1] - bbox[1]) / dy); return (a < 0 || b < 0 || a >= nx || b >= ny) ? 1e9 : D[b * nx + a] * res; }; }
+  const ring = ward.features[0].geometry.coordinates[0];
+  const R1 = raster([ring], [-37.09, -10.945, -37.01, -10.845], 2);
+  let n = 0, a5 = 0, a10 = 0, a15 = 0;
+  for (const p of azul.geometry.coordinates) { const d = R1(p); if (d > 150) continue; n++; if (d <= 5) a5++; if (d <= 10) a10++; if (d <= 15) a15++; }
+  const pct = x => Math.round(100 * x / n) + '%';
+  document.getElementById('st1').innerHTML = '<div><b>' + pct(a5) + '</b><span>até 5 m</span></div><div><b>' + pct(a10) + '</b><span>até 10 m</span></div><div><b>' + pct(a15) + '</b><span>até 15 m</span></div>';
+  // norte (zoom 13)
+  const RN = raster([ring], [-37.05, -10.80, -36.64, -10.46], 4);
+  let nn = 0, b20 = 0, b30 = 0, b40 = 0;
+  for (const p of azN.geometry.coordinates) { if (p[1] <= -10.734) continue; const d = RN(p); if (d > 300) continue; nn++; if (d <= 20) b20++; if (d <= 30) b30++; if (d <= 40) b40++; }
+  const pn = x => Math.round(100 * x / nn) + '%';
+  document.getElementById('st2').innerHTML = '<div><b>' + pn(b20) + '</b><span>até 20 m</span></div><div><b>' + pn(b30) + '</b><span>até 30 m</span></div><div><b>' + pn(b40) + '</b><span>até 40 m</span></div>';
+
+  // demais trechos: desvio típico do limite até os pixels azuis da captura mais fina
+  const R2 = raster([ring], [-37.3, -11.0, -36.6, -10.45], 15);
+  const linhas = [
+    ['Rio Sergipe até a foz / Atalaia Nova', 'z13', p => p[1] < -10.935 && p[0] > -37.06 && p[0] < -37.02],
+    ['Litoral (mar) da Barra até Pirambu', 'z12', p => p[1] > -10.95 && p[1] < -10.81 && p[0] > -37.0 ],
+    ['Divisa reta Barra × Santo Amaro/Pirambu', 'z12', p => p[1] > -10.845 && p[1] < -10.81 && p[0] > -37.0 && p[0] < -36.93],
+  ];
+  const rows = [];
+  for (const [nome, cap, filt] of linhas) { const f = outros.features.find(x => x.properties.captura === cap); const ds = f.geometry.coordinates.filter(filt).map(p => R2(p)).filter(d => d < 300).sort((x, y) => x - y);
+    const med = ds.length ? Math.round(ds[Math.floor(ds.length / 2)]) : null; const faixa = Math.round(3 * f.properties.metros_por_pixel);
+    rows.push('<tr><td>' + nome + '</td><td>' + cap + ' (' + f.properties.metros_por_pixel + ' m/px)</td><td>' + (med === null ? '—' : med + ' m <small>(faixa azul ~' + faixa + ' m)</small>') + '</td></tr>'); }
+  rows.push('<tr><td>Divisa reta: forma geral</td><td>z13 + z15</td><td>3,6 km iniciais pela faixa azul (leve curva) e reta até o ponto exato no Rio Sergipe</td></tr>');
+  rows.push('<tr><td>Divisa Distrito 01 × 02</td><td>ruas do OSM</td><td>sobre o eixo</td></tr>');
+  document.getElementById('outros').innerHTML = rows.join('');
+
+  const J = [
+    ['Rio do Sal / Porto Dantas', [-10.8705, -37.058], 15], ['R. Santa Terezinha', [-10.888, -37.067], 16], ['Área militar (28º BC)', [-10.899, -37.072], 16],
+    ['Av. Maranhão × Av. São Paulo', [-10.9036, -37.075], 17], ['Av. Gentil Tavares', [-10.9085, -37.0612], 17], ['Av. Des. Maynard / Barão de Maruim', [-10.9185, -37.052], 16],
+    ['Divisa 01×02 (Petrox)', [-10.905, -37.022], 15], ['SE-226 (Japaratuba–Pirambu)', [-10.66, -36.90], 12], ['Contorno de Japaratuba', [-10.597, -36.944], 14],
+    ['São José da Caatinga', [-10.655, -36.903], 14], ['Início da divisa reta (Pirambu)', [-10.727, -36.873], 14], ['Rio Papagaio / Santa Isabel', [-10.604, -36.718], 13], ['Toda a ala', null, 0]];
+  const jump = document.getElementById('jump');
+  for (const [t, c, z] of J) { const b = document.createElement('button'); b.textContent = t; b.onclick = () => c ? map.setView(c, z) : map.fitBounds(L.geoJSON(ward).getBounds()); jump.appendChild(b); }
+})();
+</script>
+</body>
+</html>

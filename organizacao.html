@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Organização dos Grupos por Distrito</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  @page { size: A4; margin: 11mm 12mm; }
+  :root { --text: #1b1b1a; --muted: #62625c; --rule: #dcdbd4; --soft: #f3f2ed; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #fff; color: var(--text);
+    font: 10.5pt/1.4 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+    -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .page { width: 186mm; margin: 0 auto; page-break-after: always; break-after: page; }
+  .page:last-child { page-break-after: auto; break-after: auto; }
+  @media screen { body { background: #e9e8e3; padding: 16px 0; } .page { background: #fff; padding: 11mm 12mm; width: 210mm; min-height: 297mm; margin: 0 auto 16px; box-shadow: 0 2px 12px rgba(0,0,0,.12); } }
+  .eyebrow { font-size: 8.5pt; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 0 0 2mm; }
+  h1 { font-size: 19pt; line-height: 1.15; margin: 0 0 1.5mm; font-weight: 700; }
+  .sub { color: var(--muted); margin: 0 0 6mm; font-size: 10pt; }
+  h2 { font-size: 12pt; margin: 6mm 0 3mm; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  th { text-align: left; font-size: 8.5pt; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600; padding: 0 2mm 2mm; border-bottom: 1.5px solid var(--text); }
+  td { padding: 2.4mm 2mm; border-bottom: 1px solid var(--rule); vertical-align: top; }
+  td.dist { white-space: nowrap; width: 1%; }
+  .badge { display: inline-block; color: #fff; font-weight: 700; font-size: 9pt; border-radius: 99px; padding: .4mm 2.6mm; font-variant-numeric: tabular-nums; }
+  .reg { font-weight: 650; }
+  .lider { font-weight: 650; }
+  .areas { display: grid; gap: 2.6mm; }
+  .area { display: grid; grid-template-columns: 4mm 1fr; gap: 2.5mm; break-inside: avoid; }
+  .sw { width: 4mm; height: 4mm; border-radius: 1mm; margin-top: .9mm; }
+  .area b { font-weight: 650; }
+  .area p { margin: .6mm 0 0; color: #33332f; font-size: 9.5pt; }
+  .note { font-size: 8.5pt; color: var(--muted); margin-top: 5mm; border-top: 1px solid var(--rule); padding-top: 2.5mm; }
+  .map { width: 186mm; border: 1px solid var(--rule); border-radius: 2mm; overflow: hidden; }
+  #m1 { height: 134mm; } #m2 { height: 90mm; }
+  .map .leaflet-tile-pane { filter: saturate(.45) brightness(1.04); }
+  .cap { display: flex; justify-content: space-between; align-items: baseline; margin: 5mm 0 2mm; }
+  .cap h2 { margin: 0; }
+  .cap span { font-size: 8.5pt; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 1.5mm 4mm; font-size: 8.5pt; margin-top: 2mm; }
+  .legend i { display: inline-block; width: 3.2mm; height: 3.2mm; border-radius: .8mm; vertical-align: -.5mm; margin-right: 1.2mm; }
+  .legend .ward { width: 6mm; height: 0; border-top: 2.5px solid #1E88E5; border-radius: 0; vertical-align: .8mm; }
+  .legend .cut { width: 6mm; height: 0; border-top: 2px dashed #1d1d1f; border-radius: 0; vertical-align: .8mm; }
+  /* sem box-shadow: o Chrome imprime a sombra como um quadrado cinza; o contorno escuro vem do anel externo */
+  .num-ring { width: 26px; height: 26px; border-radius: 50%; background: rgba(0,0,0,.35); padding: 1px; }
+  .num { width: 24px; height: 24px; border-radius: 50%; color: #fff; font: 700 10px/20px "Segoe UI", system-ui, sans-serif; text-align: center; border: 2px solid #fff; }
+  .lbl { text-align: center; line-height: 1.15; }
+  .lbl { background: transparent; border: 0; box-shadow: none; font: 600 9.5px "Segoe UI", system-ui, sans-serif; color: #1d1d1f; text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 3px #fff; padding: 0; }
+  .lbl::before { display: none; }
+  .leaflet-control-attribution { font-size: 7px !important; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&family=Noto+Serif:wght@400;700&display=swap">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<section class="page">
+  <img class="logo-igreja" src="img/logo-igreja.svg" alt="A Igreja de Jesus Cristo dos Santos dos Últimos Dias">
+  <p class="eyebrow" id="eb"></p>
+  <h1 id="tt"></h1>
+  <p class="sub" id="sb"></p>
+  <table>
+    <thead><tr><th>Distrito</th><th>Região</th><th>Líder</th><th>Assistente 01</th><th>Assistente 02</th></tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
+  <h2>Bairros e localidades de cada distrito</h2>
+  <div class="areas" id="areas"></div>
+  <p class="note" id="nota"></p>
+</section>
+
+<section class="page">
+  <div class="cap"><h2>Mapa — Aracaju e Barra dos Coqueiros</h2><span>Recorte dos bairros pelo limite azul da ala</span></div>
+  <div class="map" id="m1"></div>
+  <div class="legend" id="lg1"></div>
+  <div class="cap"><h2>Mapa — toda a área da ala</h2><span>Do Centro de Aracaju até o litoral de Pirambu</span></div>
+  <div class="map" id="m2"></div>
+</section>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@turf/turf@6.5.0/turf.min.js"></script>
+<script src="geo.js"></script>
+<script src="distritos.js"></script>
+<script src="app-core.js"></script>
+<script>
+(async function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  $('eb').textContent = UNIDADE.ala + ' · ' + UNIDADE.estaca;
+  $('tt').textContent = UNIDADE.titulo;
+  const hoje = new Date();
+  $('sb').textContent = '7 distritos, cada um com líder e dois assistentes · atualizado em ' + hoje.toLocaleDateString('pt-BR');
+
+  const data = await AppCore.build();
+  const { ward, districts, places, petrox } = data;
+
+  // Tabela
+  $('tb').innerHTML = districts.map(d =>
+    '<tr><td class="dist"><span class="badge" style="background:' + d.cor + '">' + d.codigo + '</span></td>' +
+    '<td class="reg">' + esc(d.nome) + '</td><td class="lider">' + esc(d.lider) + '</td>' +
+    '<td>' + esc(d.assistentes[0]) + '</td><td>' + esc(d.assistentes[1]) + '</td></tr>').join('');
+
+  // Bairros / localidades
+  $('areas').innerHTML = districts.map(d => {
+    const regs = AppCore.regioes(d);
+    return '<div class="area"><div class="sw" style="background:' + d.cor + '"></div><div><b>Distrito ' + d.codigo + ' — ' + esc(d.nome) + '</b>' +
+      '<p>' + esc(regs.join(', ')) + '.</p></div></div>';
+  }).join('');
+  $('nota').textContent = 'Limite conferido com o mapa azul do diretório da ala: onde a linha azul segue rua, rodovia ou rio, o traçado está sobre o eixo dessa via (OpenStreetMap). ' +
+    '"(parte)" = só o trecho do bairro que fica dentro do limite. Divisa entre os Distritos 01 e 02 pelas ruas: Av. Esther Sampaio Martins (da praia até o Posto Petrox Praia Mar), ' +
+    'Rod. Eng. Edilson Távora, Rod. José de Campos e Rod. Des. Antônio Xavier de Assis Júnior até a Ponte Construtor João Alves; ao norte dela (sentido Pirambu) é o Distrito 02.';
+
+  // Legenda
+  $('lg1').innerHTML = districts.map(d => '<span><i style="background:' + d.cor + '"></i>' + d.codigo + ' ' + esc(d.nome) + '</span>').join('') +
+    '<span><i class="ward"></i>Limite azul da ala (conferido rua a rua)</span><span><i class="cut"></i>Divisa 01 × 02 pelas ruas (Posto Petrox)</span>';
+
+  let pend = 0;
+  function makeMap(id, bounds, opts) {
+    const m = L.map(id, { zoomControl: false, attributionControl: true, zoomSnap: 0.25, dragging: false, scrollWheelZoom: false, fadeAnimation: false, zoomAnimation: false });
+    m.fitBounds(bounds, { padding: [8, 8] });
+    pend++;
+    const t = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© colaboradores do OpenStreetMap' }).addTo(m);
+    t.once('load', () => { pend--; if (!pend) document.body.dataset.mapas = 'ok'; });
+    for (const d of districts) if (d.feature) L.geoJSON(d.feature, { style: { color: d.cor, weight: 1.2, fillColor: d.cor, fillOpacity: .42 } }).addTo(m);
+    if (opts.bairros) for (const d of districts) for (const b of d.bairros) {
+      L.geoJSON(b.feature, { style: { color: '#fff', weight: .9, dashArray: '3 3', fill: false } }).addTo(m);
+      // Posições ajustadas à mão onde os nomes se encavalavam (centro-norte de Aracaju)
+      const fixo = (opts.posBairros || {})[b.nome];
+      const c = fixo ? [fixo.ll[1], fixo.ll[0]] : turf.pointOnFeature(b.feature).geometry.coordinates;
+      L.tooltip({ permanent: true, direction: 'center', offset: fixo ? [0, 0] : [0, 20], className: 'lbl' }).setLatLng([c[1], c[0]]).setContent(fixo && fixo.txt ? fixo.txt : AppCore.bairroLabel(b)).addTo(m);
+    }
+    L.geoJSON(ward, { style: { color: '#1E88E5', weight: opts.bairros ? 3 : 2.4, fill: false } }).addTo(m);
+    for (const [ll, txt] of opts.labels || []) L.tooltip({ permanent: true, direction: 'center', className: 'lbl' }).setLatLng(ll).setContent(txt).addTo(m);
+    for (const [ll, d] of opts.nums) L.marker(ll, { icon: L.divIcon({ className: '', html: '<div class="num-ring"><div class="num" style="background:' + d.cor + '">' + d.codigo + '</div></div>', iconSize: [26, 26], iconAnchor: [13, 13] }) }).addTo(m);
+    return m;
+  }
+  const D = id => districts.find(d => d.id === id);
+  const pof = d => { const c = turf.pointOnFeature(d.feature).geometry.coordinates; return [c[1], c[0]]; };
+
+  const m1 = makeMap('m1', [[-10.953, -37.078], [-10.853, -36.99]], {
+    bairros: true,
+    nums: [[pof(D(1)), D(1)], [[-10.873, -36.997], D(2)], [[-10.9091, -37.0470], D(3)], [pof(D(4)), D(4)], [[-10.8986, -37.0728], D(5)], [[-10.8785, -37.0692], D(6)], [pof(D(7)), D(7)]],
+    posBairros: {
+      'Lamarão': { ll: [-10.8779, -37.0858], txt: 'Coqueiral<br>(junto ao Rio do Sal)' },
+      'Japãozinho': { ll: [-10.8839, -37.0689] },
+      'Palestina': { ll: [-10.8945, -37.0679] },
+      'Santo Antônio': { ll: [-10.9005, -37.0601], txt: 'Santo<br>Antônio' },
+      '18 do Forte': { ll: [-10.9047, -37.0725] },
+      'Getúlio Vargas': { ll: [-10.9097, -37.0598], txt: 'Getúlio Vargas<br>(parte)' },
+      'Santos Dumont': { ll: [-10.9098, -37.0796] },
+      'Centro': { ll: [-10.9149, -37.0498] }
+    },
+    labels: [[[-10.9061, -37.0341], 'Centro (Barra)'], [[-10.9443, -37.0298], 'Atalaia Nova'], [[-10.9012, -37.0149], "Olhos d'Água"], [[-10.8849, -37.0256], 'Ilha Pomonga'], [[-10.8802, -36.9971], 'Capoã'], [[-10.9301, -37.0251], 'Alphaville']]
+  });
+  L.polyline(data.corte.slice(1, -1).map(p => [p[1], p[0]]), { color: '#1d1d1f', weight: 2, dashArray: '6 5' }).addTo(m1);
+  L.marker([petrox.lat, petrox.lon], { icon: L.divIcon({ className: '', html: '<div style="width:18px;height:18px;border-radius:4px;background:#1d1d1f;color:#fff;font:700 10px/18px system-ui;text-align:center">P</div>', iconSize: [18, 18], iconAnchor: [9, 9] }) }).addTo(m1);
+
+  const wb = L.geoJSON(ward).getBounds();
+  const m2 = makeMap('m2', wb, {
+    bairros: false,
+    // 07 e 01 afastados e nomes Aracaju/Barra para fora do grupo, para nada ficar um sobre o outro
+    nums: [[[-10.70, -36.84], D(2)], [[-10.84, -36.95], D(2)], [[-10.9414, -37.0219], D(1)], [[-10.8750, -37.0656], D(7)]],
+    labels: [[[-10.7409, -36.8591], 'Pirambu'], [[-10.6253, -36.7452], 'Santa Isabel'], [[-10.9114, -37.0983], 'Aracaju'], [[-10.9221, -36.9892], 'Barra']]
+  });
+  window.__pronto = true;
+})();
+</script>
+</body>
+</html>

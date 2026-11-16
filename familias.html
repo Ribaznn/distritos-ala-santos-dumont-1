@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Famílias por Distrito</title>
+<style>
+  :root { --bg: #f4f4f1; --panel: #fff; --text: #1d1d1f; --muted: #66665f; --border: #e3e2dc; --chip: #f1f0ea; --c: #1d1d1f; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #151614; --panel: #1e1f1c; --text: #ecebe6; --muted: #a3a29b; --border: #33342f; --chip: #2a2b27; } }
+  :root[data-theme="dark"] { --bg: #151614; --panel: #1e1f1c; --text: #ecebe6; --muted: #a3a29b; --border: #33342f; --chip: #2a2b27; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.45 "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin: 0 0 4px; }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  .sub { color: var(--muted); margin: 0 0 14px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 16px; }
+  .tab { border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 13px; cursor: pointer; display: inline-flex; gap: 6px; align-items: center; }
+  .tab i { width: 10px; height: 10px; border-radius: 50%; background: var(--tc); display: inline-block; }
+  .tab.on { background: var(--text); color: var(--panel); border-color: var(--text); }
+  .head { background: var(--panel); border: 1px solid var(--border); border-left: 6px solid var(--c); border-radius: 12px; padding: 14px 16px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr auto; gap: 6px 16px; }
+  .head h2 { margin: 0; font-size: 18px; }
+  .head .people { color: var(--muted); font-size: 13px; }
+  .head .people b { color: var(--text); font-weight: 600; }
+  .nums { text-align: right; font-variant-numeric: tabular-nums; }
+  .nums b { font-size: 22px; display: block; line-height: 1.1; }
+  .nums span { font-size: 12px; color: var(--muted); }
+  .tools { display: flex; gap: 8px; margin: 10px 0; flex-wrap: wrap; }
+  .tools input { flex: 1; min-width: 200px; padding: 8px 10px; border-radius: 8px; border: 1px solid var(--border); background: var(--panel); color: var(--text); font: inherit; }
+  .btn { border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 8px; padding: 7px 12px; font: inherit; font-size: 13px; cursor: pointer; text-decoration: none; }
+  .btn:hover { background: var(--chip); }
+  ol { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+  li { display: grid; grid-template-columns: 34px 1fr auto; gap: 4px 10px; padding: 9px 14px; border-top: 1px solid var(--border); align-items: baseline; }
+  li:first-child { border-top: 0; }
+  .idx { color: var(--muted); font-variant-numeric: tabular-nums; font-size: 12px; }
+  .nm { font-weight: 600; }
+  .ad { grid-column: 2; color: var(--muted); font-size: 12.5px; }
+  .tag { font-size: 11px; color: var(--muted); white-space: nowrap; }
+  .tag.e { color: #b26a00; }
+  .empty { padding: 20px; color: var(--muted); }
+  .note { font-size: 12px; color: var(--muted); margin-top: 14px; }
+  .vm { grid-column: 3; grid-row: 2; justify-self: end; align-self: center; border: 1px solid var(--border); background: var(--panel); color: var(--text); border-radius: 999px; padding: 3px 10px; font: inherit; font-size: 12px; cursor: pointer; white-space: nowrap; }
+  .vm:hover { background: var(--chip); }
+  .vm::after { content: ' ▾'; color: var(--muted); }
+  li.open .vm { background: var(--chip); }
+  li.open .vm::after { content: ' ▴'; }
+  .mb { display: none; grid-column: 2 / -1; margin: 6px 0 2px; border-left: 3px solid var(--c); background: var(--chip); border-radius: 0 8px 8px 0; padding: 4px 0; }
+  li.open .mb { display: block; }
+  .mb table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .mb th { text-align: left; font-weight: 600; font-size: 11px; letter-spacing: .03em; text-transform: uppercase; color: var(--muted); padding: 4px 12px; }
+  .mb td { padding: 5px 12px; border-top: 1px solid var(--border); }
+  .mb .ag { text-align: right; white-space: nowrap; font-variant-numeric: tabular-nums; width: 1%; }
+  .mb .nd { color: var(--muted); }
+  .mb .rs { font-size: 10.5px; color: var(--muted); border: 1px solid var(--border); border-radius: 999px; padding: 0 6px; margin-left: 6px; white-space: nowrap; }
+  mark { background: #ffe58a; color: #1d1d1f; border-radius: 2px; }
+  @media print { .tabs, .tools, .note .noprint, .vm { display: none; } body { background: #fff; } .head, ol { border-color: #ccc; } .mb { background: none; } }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600;700&family=Noto+Serif:wght@400;700&display=swap">
+<link rel="stylesheet" href="tema.css">
+</head>
+<body>
+<div class="wrap">
+  <img class="logo-igreja" src="img/logo-igreja.svg" alt="A Igreja de Jesus Cristo dos Santos dos Últimos Dias">
+  <p class="eyebrow" id="eb"></p>
+  <h1>Famílias por Distrito</h1>
+  <p class="sub" id="sub">Carregando…</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="head" id="head"></div>
+  <div class="tools">
+    <input id="q" type="search" placeholder="Procurar família, membro ou endereço…" aria-label="Procurar">
+    <button class="btn" id="todos">Abrir todos os membros</button>
+    <button class="btn" onclick="window.print()">Imprimir lista</button>
+    <a class="btn" href="index.html">← Mapa dos distritos</a>
+  </div>
+  <ol id="lista"></ol>
+  <p class="note">Lista feita a partir do diretório da ala. <b>Contém dados pessoais: use só para o trabalho dos distritos e não publique.</b>
+    “mapa” = família localizada pelo ponto do diretório; <span style="color:#b26a00">“endereço”</span> = o ponto do diretório não era confiável e o distrito saiu do endereço/CEP — vale confirmar.
+    Lares marcados como privados não aparecem no diretório.
+    Clique em <b>Ver membros</b> para abrir quem mora em cada lar. A idade só aparece quando o diretório a informa: hoje ele mostra idade apenas para a sua própria família; nas demais aparece “—”.</p>
+</div>
+<script src="distritos.js"></script>
+<script src="cofre.js"></script>
+<script>
+(async function () {
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  $('eb').textContent = UNIDADE.ala + ' · ' + UNIDADE.estaca;
+  const data = await Cofre.carregar();
+  const grupos = DISTRITOS.map(d => ({ id: String(d.id), titulo: 'Distrito ' + d.codigo + ' — ' + d.nome, curto: d.codigo + ' ' + d.nome, cor: d.cor, d }))
+    .concat([{ id: '0', titulo: 'A confirmar', curto: 'A confirmar', cor: '#8a8a84', d: null }]);
+  const total = Object.values(data.distritos).reduce((s, v) => s + v.length, 0);
+  $('sub').textContent = total + ' famílias do diretório distribuídas nos 7 distritos (atualizado em ' + data.geradoEm.split('-').reverse().join('/') + ').';
+  let atual = (new URLSearchParams(location.hash.slice(1)).get('d')) || '1';
+  function tabs() {
+    $('tabs').innerHTML = grupos.map(g => '<button class="tab' + (g.id === atual ? ' on' : '') + '" data-id="' + g.id + '" style="--tc:' + g.cor + '"><i></i>' + esc(g.curto) + ' (' + (data.distritos[g.id] || []).length + ')</button>').join('');
+    $('tabs').querySelectorAll('.tab').forEach(b => b.onclick = () => { atual = b.dataset.id; history.replaceState(null, '', '#d=' + atual); render(); });
+  }
+  function render() {
+    tabs();
+    const g = grupos.find(x => x.id === atual) || grupos[0];
+    const fam = data.distritos[g.id] || [];
+    const pessoas = fam.reduce((s, h) => s + (h.pessoas || 0), 0);
+    document.documentElement.style.setProperty('--c', g.cor);
+    $('head').innerHTML = '<div><h2>' + esc(g.titulo) + '</h2>' + (g.d ? '<div class="people">Líder <b>' + esc(g.d.lider) + '</b> · Assistentes <b>' + esc(g.d.assistentes[0]) + '</b> e <b>' + esc(g.d.assistentes[1]) + '</b></div><div class="people">' + esc(g.d.descricao) + '</div>'
+      : '<div class="people">Famílias sem localização confiável no diretório e com endereço incompleto. Defina o distrito de cada uma com os líderes.</div>') + '</div>' +
+      '<div class="nums"><b>' + fam.length + '</b><span>famílias · ' + pessoas + ' pessoas</span></div>';
+    document.title = 'Famílias — ' + g.curto;
+    const q = norm($('q').value.trim());
+    const lista = fam.filter(h => !q || norm(h.nome + ' ' + h.endereco).includes(q) || (h.membros || []).some(m => norm(m.n).includes(q)));
+    $('lista').innerHTML = lista.length ? lista.map((h, i) => {
+      const ms = h.membros || [];
+      const achou = q && ms.some(m => norm(m.n).includes(q));
+      const aberto = abertos.has(h.nome) || achou;
+      return '<li class="' + (aberto ? 'open' : '') + '" data-k="' + esc(h.nome) + '"><span class="idx">' + (i + 1) + '</span><span class="nm">' + esc(h.nome) + '</span>' +
+        '<span class="tag' + (h.criterio !== 'mapa' ? ' e' : '') + '" title="' + esc(h.obs || '') + '">' + h.pessoas + (h.pessoas === 1 ? ' pessoa' : ' pessoas') + ' · ' + esc(h.criterio) + '</span>' +
+        '<span class="ad">' + (h.restrito ? 'endereço restrito aos líderes' : esc(h.endereco || 'sem endereço no diretório')) + '</span>' +
+        (ms.length ? '<button class="vm" aria-expanded="' + aberto + '">Ver membros</button>' +
+          '<div class="mb"><table><thead><tr><th>Nome</th><th class="ag">Idade</th></tr></thead><tbody>' +
+          ms.map(m => '<tr><td>' + marca(m.n, q) + (m.r ? '<span class="rs">responsável</span>' : '') + '</td>' +
+            '<td class="ag">' + (typeof m.i === 'number' ? m.i + (m.i === 1 ? ' ano' : ' anos') : '<span class="nd" title="O diretório não informa a idade deste membro">—</span>') + '</td></tr>').join('') +
+          '</tbody></table></div>' : '') + '</li>';
+    }).join('')
+      : '<div class="empty">Nenhuma família encontrada.</div>';
+    const n = $('lista').querySelectorAll('li').length, o = $('lista').querySelectorAll('li.open').length;
+    $('todos').textContent = n && o === n ? 'Fechar todos os membros' : 'Abrir todos os membros';
+  }
+  const norm = s => String(s || '').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  function marca(nome, q) {
+    if (!q) return esc(nome);
+    const i = norm(nome).indexOf(q);
+    return i < 0 ? esc(nome) : esc(nome.slice(0, i)) + '<mark>' + esc(nome.slice(i, i + q.length)) + '</mark>' + esc(nome.slice(i + q.length));
+  }
+  const abertos = new Set();
+  $('lista').addEventListener('click', e => {
+    const b = e.target.closest('.vm'); if (!b) return;
+    const li = b.closest('li'), k = li.dataset.k;
+    const on = !li.classList.contains('open');
+    li.classList.toggle('open', on); b.setAttribute('aria-expanded', on);
+    if (on) abertos.add(k); else abertos.delete(k);
+  });
+  $('todos').addEventListener('click', () => {
+    const lis = [...$('lista').querySelectorAll('li')];
+    const abrir = lis.some(li => !li.classList.contains('open'));
+    lis.forEach(li => { if (abrir) abertos.add(li.dataset.k); else abertos.delete(li.dataset.k); });
+    render();
+  });
+  $('q').addEventListener('input', render);
+  window.addEventListener('hashchange', () => { atual = new URLSearchParams(location.hash.slice(1)).get('d') || '1'; render(); });
+  render();
+})();
+</script>
+</body>
+</html>
