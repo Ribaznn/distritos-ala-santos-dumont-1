@@ -13,13 +13,13 @@ window.UNIDADE = {
 window.DISTRITOS = [
   {
     id: 1, codigo: '01', nome: 'Centro Barra', cor: '#E4572E',
-    descricao: 'Barra dos Coqueiros ao sul/oeste da Av. Esther Sampaio Martins e da Rod. José de Campos (centro até Atalaia Nova)',
+    descricao: 'Barra dos Coqueiros a oeste da Rod. José de Campos (SE-100): centro, Serigy, Alphaville até Atalaia Nova',
     lider: 'Moacir', assistentes: ['Daniel', 'Jeancarla'],
     regra: { tipo: 'barra', lado: 'sul' }
   },
   {
     id: 2, codigo: '02', nome: "Olhos d'Água", cor: '#E8A317',
-    descricao: 'Do Posto Petrox sentido Pirambu: norte da Av. Esther Sampaio Martins e leste da Rod. José de Campos, até o limite norte da ala',
+    descricao: 'Do Posto Petrox sentido Pirambu e a leste da Rod. José de Campos (SE-100) até a praia (Espaço Tropical, Brisas, Luar e Quintas da Barra), até o limite norte da ala',
     lider: 'David Ivan', assistentes: ['Douglas Dantas', 'Elaine Alfano'],
     regra: { tipo: 'barra', lado: 'norte' }
   },

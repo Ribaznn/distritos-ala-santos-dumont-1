@@ -2,7 +2,7 @@
 // Depende de: turf, geo.js (OsmGeo), distritos.js (DISTRITOS)
 window.AppCore = (function () {
   // Divisa Distrito 01 x 02 pelas ruas (data/divisa_d1_d2.geojson):
-  // Av. Esther Sampaio Martins (praia -> Posto Petrox) + Rod. Edilson Távora + Rod. José de Campos até a ponte.
+  // Praia (depois do Alphaville) -> Rod. José de Campos/SE-100 -> Posto Petrox -> Rod. José de Campos até a ponte (alterada em 23/11/2026).
   // O polígono "sul" é tudo abaixo/à oeste dessa linha.
   function sideOf(div) {
     const L = div.features[0].geometry.coordinates;

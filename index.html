@@ -220,7 +220,7 @@
 
   // Posto Petrox + linha de divisa D01/D02
   L.polyline(data.corte.slice(1, -1).map(p => [p[1], p[0]]), { color: '#1d1d1f', weight: 2.5, dashArray: '7 5' })
-    .bindTooltip('<b>Divisa Distrito 01 × 02</b><br>Av. Esther Sampaio Martins → Posto Petrox → Rod. José de Campos → Ponte Construtor João Alves', { sticky: true }).addTo(map);
+    .bindTooltip('<b>Divisa Distrito 01 × 02</b><br>Praia (depois do Alphaville) → Rod. José de Campos/SE-100 → Posto Petrox → Rod. José de Campos → Ponte Construtor João Alves', { sticky: true }).addTo(map);
   L.marker([petrox.lat, petrox.lon], { icon: L.divIcon({ className: '', html: '<div class="fuel">P</div>', iconSize: [24, 24], iconAnchor: [12, 12] }) })
     .bindTooltip('<b>Posto Petrox Praia Mar</b><br>Daqui sentido Pirambu: Distrito 02').addTo(map);
 

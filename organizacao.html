@@ -110,8 +110,8 @@
       '<p>' + esc(regs.join(', ')) + '.</p></div></div>';
   }).join('');
   $('nota').textContent = 'Limite conferido com o mapa azul do diretório da ala: onde a linha azul segue rua, rodovia ou rio, o traçado está sobre o eixo dessa via (OpenStreetMap). ' +
-    '"(parte)" = só o trecho do bairro que fica dentro do limite. Divisa entre os Distritos 01 e 02 pelas ruas: Av. Esther Sampaio Martins (da praia até o Posto Petrox Praia Mar), ' +
-    'Rod. Eng. Edilson Távora, Rod. José de Campos e Rod. Des. Antônio Xavier de Assis Júnior até a Ponte Construtor João Alves; ao norte dela (sentido Pirambu) é o Distrito 02.';
+    '"(parte)" = só o trecho do bairro que fica dentro do limite. Divisa entre os Distritos 01 e 02 pelas ruas: Rod. José de Campos (SE-100) da praia, depois do Alphaville, até o Posto Petrox Praia Mar, ' +
+    'e daí Rod. José de Campos e Rod. Des. Antônio Xavier de Assis Júnior até a Ponte Construtor João Alves; a leste/norte dela (sentido Pirambu) é o Distrito 02.';
 
   // Legenda
   $('lg1').innerHTML = districts.map(d => '<span><i style="background:' + d.cor + '"></i>' + d.codigo + ' ' + esc(d.nome) + '</span>').join('') +
